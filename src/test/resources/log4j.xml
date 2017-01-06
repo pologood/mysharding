@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+        <!-- 屏幕输出  appender定义 -->
+        <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+                <layout class="org.apache.log4j.PatternLayout">
+                        <param name="ConversionPattern" value="[%t] %-5p %c - %m%n" />
+                </layout>
+        </appender>
+
+        <logger name="org.apache.ibatis">
+                <level value="INFO" />
+        </logger>
+        
+        <logger name="java.sql">
+                <level value="INFO" />
+        </logger>
+
+        <root>
+                <level value="DEBUG"/>
+                <appender-ref ref="STDOUT" />
+                <!--
+                <appender-ref ref="LOGFILE" />-->
+        </root>
+
+</log4j:configuration>

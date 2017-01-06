@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd">
+    <!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass">
+            <value>${datasource.jdbc.driver}</value>
+        </property>
+        <property name="jdbcUrl">
+            <value>${datasource.jdbc.url}</value>
+        </property>
+        <property name="user">
+            <value>${datasource.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${datasource.jdbc.password}</value>
+        </property>
+        <property name="initialPoolSize">
+            <value>${datasource.jdbc.initialPoolSize}</value>
+        </property>
+        <property name="minPoolSize">
+            <value>${datasource.jdbc.minPoolSize}</value>
+        </property>
+        <property name="maxPoolSize">
+            <value>${datasource.jdbc.maxPoolSize}</value>
+        </property>
+        <property name="maxIdleTime">
+            <value>${datasource.jdbc.maxIdleTime}</value>
+        </property>
+        <property name="acquireIncrement">
+            <value>${datasource.jdbc.acquireIncrement}</value>
+        </property>
+        <property name="acquireRetryAttempts">
+            <value>${datasource.jdbc.acquireRetryAttempts}</value>
+        </property>
+        <property name="acquireRetryDelay">
+            <value>${datasource.jdbc.acquireRetryDelay}</value>
+        </property>
+        <property name="maxStatements">
+            <value>${datasource.jdbc.maxStatements}</value>
+        </property>
+        <property name="maxStatementsPerConnection">
+            <value>${datasource.jdbc.maxStatementsPerConnection}</value>
+        </property>
+        <property name="checkoutTimeout">
+            <value>${datasource.jdbc.checkoutTimeout}</value>
+        </property>
+        <property name="breakAfterAcquireFailure">
+            <value>${datasource.jdbc.breakAfterAcquireFailure}</value>
+        </property>
+    </bean>-->
+
+    <bean id="dataSource_0" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${datasource.jdbc.driver}" />
+        <property name="url" value="${datasource.jdbc.url}" />
+        <property name="username" value="${datasource.jdbc.username}" />
+        <property name="password" value="${datasource.jdbc.password}" />
+    </bean>
+
+    <bean id="dataSource_1" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="${datasource.jdbc.driver}" />
+        <property name="url" value="${datasource.jdbc.url_1}" />
+        <property name="username" value="${datasource.jdbc.username}" />
+        <property name="password" value="${datasource.jdbc.password}" />
+    </bean>
+
+    <jdbc:initialize-database data-source="dataSource_0" ignore-failures="ALL">
+        <jdbc:script location="classpath:sql/h2/promosharding-schema.sql" />
+    </jdbc:initialize-database>
+    <jdbc:initialize-database data-source="dataSource_1" ignore-failures="ALL">
+        <jdbc:script location="classpath:sql/h2/promosharding-schema_1.sql" />
+    </jdbc:initialize-database>
+
+
+
+    <bean id="dataSource" class="com.jd.promo.sharding.mybatis.ShardDataSource">
+        <property name="logicDatabaseName" value="db"/>
+        <property name="dataSources">
+            <map value-type="javax.sql.DataSource">
+                <entry key="db0" value-ref="dataSource_0"/>
+                <entry key="db1" value-ref="dataSource_1"/>
+            </map>
+        </property>
+    </bean>
+
+	<!-- myBatis文件 -->
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation">
+            <bean class="org.springframework.core.io.ClassPathResource">
+                <constructor-arg index="0" value="mybatis/mybatis-config.xml" />
+            </bean>
+        </property>
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="transactionTemplate"
+          class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+</beans>

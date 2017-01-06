@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shardingConfig>
+    <router name="SimpleRouter" class="com.jd.promo.sharding.mybatis.router.SimpleRouter"/>
+    <router name="MyRouter" class="com.jd.promo.sharding.mybatis.test.routerext.MyRouter"/>
+
+    <routeCondition routerName="SimpleRouter" name="defalt">
+        <dbCount>2</dbCount>
+        <routeField>userId</routeField>
+        <dbStartWith>0</dbStartWith>
+        <tableCount>4</tableCount>
+        <tableStartWith>1</tableStartWith>
+        <dbSplit></dbSplit>
+        <tableSplit>_</tableSplit>
+        <needPadToAlign>false</needPadToAlign>
+    </routeCondition>
+
+    <routeCondition name="sys_user" parent="defalt"/>
+
+    <routeCondition name="sys_role" routerName="SimpleRouter">
+        <dbCount>2</dbCount>
+        <routeField>roleId</routeField>
+        <dbStartWith>0</dbStartWith>
+        <tableCount>8</tableCount>
+        <tableStartWith>1</tableStartWith>
+        <dbSplit></dbSplit>
+        <tableSplit>_</tableSplit>
+        <needPadToAlign>false</needPadToAlign>
+    </routeCondition>
+    <routeCondition name="sys_user_t" parent="sys_user">
+        <dbSplit>-</dbSplit>
+    </routeCondition>
+    <routeCondition name="sys_user_t_c" parent="sys_user_t_d">
+        <dbSplit>-</dbSplit>
+    </routeCondition>
+    <routeCondition name="sys_user_t_d" parent="sys_user_t_c">
+        <dbSplit>-</dbSplit>
+    </routeCondition>
+    <routeCondition name="sys_task" routerName="MyRouter" parent="defalt">
+        <tableSuffix>_a</tableSuffix>
+    </routeCondition>
+
+</shardingConfig>
